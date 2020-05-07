@@ -1,56 +1,47 @@
 package ru.geekbrains.screen;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.Vector2;
 
 import ru.geekbrains.base.BaseScreen;
+import ru.geekbrains.math.Rect;
+import ru.geekbrains.sprite.Background;
+import ru.geekbrains.sprite.Starship;
 
 public class MenuScreen extends BaseScreen {
 
-    private Texture starShip;
-    private Vector2 startPos;
-    private Vector2 stopPos;
-    private Vector2 v;
-    private Vector2 distance;
-    private int speed;
+    private Texture bg;
+    private Texture ss;
+    private Background background;
+    private Starship starship;
 
-    public MenuScreen() {
-        super();
-        starShip = new Texture("starship.png");
-        startPos = new Vector2(Gdx.graphics.getBackBufferWidth() >> 1, Gdx.graphics.getBackBufferHeight() >> 1);
-        stopPos = new Vector2(startPos);
-        v = new Vector2();
-        distance = new Vector2();
-        speed = 5;
+    @Override
+    public void show() {
+        super.show();
+        bg = new Texture("background.jpg");
+        ss = new Texture("starship.png");
+        background = new Background(bg);
+        starship = new Starship(ss);
+    }
+
+    @Override
+    public void resize(Rect worldBounds) {
+        background.resize(worldBounds);
+        starship.resize(worldBounds);
     }
 
     @Override
     public void render(float delta) {
         super.render(delta);
-        moveShipToStopPosition();
         batch.begin();
-        batch.draw(starShip, startPos.x, startPos.y);
+        background.draw(batch);
+        starship.draw(batch);
         batch.end();
     }
 
     @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        stopPos.set(screenX, Gdx.graphics.getBackBufferHeight() - screenY);
-        distance.set(startPos);
-        v = startPos.cpy().sub(stopPos);
-        v.nor().scl(speed);
-        return super.touchDown(screenX, screenY, pointer, button);
-    }
-
-    private void moveShipToStopPosition(){
-        distance.sub(stopPos);
-        if (distance.len() >= v.len()){
-            startPos.sub(v);
-            distance.set(startPos);
-        } else {
-            startPos.set(stopPos);
-            v.set(0,0);
-        }
+    public void dispose() {
+        bg.dispose();
+        ss.dispose();
+        super.dispose();
     }
 }
