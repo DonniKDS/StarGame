@@ -59,7 +59,6 @@ public class GameScreen extends BaseScreen {
 
     @Override
     public boolean touchDragged(Vector2 touch, int pointer) {
-        starship.touchDragged(touch, pointer);
         return super.touchDragged(touch, pointer);
     }
 }

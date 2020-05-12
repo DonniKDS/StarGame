@@ -41,18 +41,6 @@ public class Starship extends Sprite {
         this.pos.set(worldBounds.pos);
     }
 
-    @Override
-    public boolean touchDown(Vector2 touch, int pointer, int button) {
-        createStopVector(touch);
-        return super.touchDown(touch, pointer, button);
-    }
-
-    @Override
-    public boolean touchDragged(Vector2 touch, int pointer) {
-        createStopVector(touch);
-        return super.touchDragged(touch, pointer);
-    }
-
     private void moveShipToStopPosition(){
         distance.sub(stopPos);
         if (distance.len() >= v.len()){
@@ -64,10 +52,22 @@ public class Starship extends Sprite {
         }
     }
 
-    private void createStopVector(Vector2 touch){
+    @Override
+    public boolean touchDown(Vector2 touch, int pointer, int button) {
         stopPos.set(touch);
         distance.set(pos);
         v = pos.cpy().sub(stopPos);
         v.nor().scl(speed);
+        return super.touchDown(touch, pointer, button);
+    }
+
+    @Override
+    public boolean touchUp(Vector2 touch, int pointer, int button) {
+        return super.touchUp(touch, pointer, button);
+    }
+
+    @Override
+    public boolean touchDragged(Vector2 touch, int pointer) {
+        return super.touchDragged(touch, pointer);
     }
 }
