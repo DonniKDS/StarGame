@@ -17,20 +17,21 @@ public class GameScreen extends BaseScreen {
     private Texture ss;
     private Background background;
     private Starship starship;
-    private TextureAtlas atlas;
+    private TextureAtlas menuAtlas;
+    private TextureAtlas mainAtlas;
     private Star[] stars;
 
     @Override
     public void show() {
         super.show();
         bg = new Texture("textures/bg.png");
-        ss = new Texture("starship.png");
-        atlas = new TextureAtlas(Gdx.files.internal("textures/menuAtlas.pack"));
+        menuAtlas = new TextureAtlas(Gdx.files.internal("textures/menuAtlas.pack"));
+        mainAtlas = new TextureAtlas(Gdx.files.internal("textures/mainAtlas.tpack"));
         background = new Background(bg);
-        starship = new Starship(ss);
+        starship = new Starship(mainAtlas);
         stars = new Star[256];
         for (int i = 0; i < stars.length; i++) {
-            stars[i] = new Star(atlas);
+            stars[i] = new Star(menuAtlas);
         }
     }
 
@@ -54,27 +55,32 @@ public class GameScreen extends BaseScreen {
     public void dispose() {
         bg.dispose();
         ss.dispose();
-        atlas.dispose();
+        menuAtlas.dispose();
+        mainAtlas.dispose();
         super.dispose();
     }
 
     @Override
     public boolean touchDown(Vector2 touch, int pointer, int button) {
+        starship.touchDown(touch, pointer, button);
         return super.touchDown(touch, pointer, button);
     }
 
     @Override
     public boolean touchUp(Vector2 touch, int pointer, int button) {
+        starship.touchUp(touch, pointer, button);
         return super.touchUp(touch, pointer, button);
     }
 
     @Override
     public boolean touchDragged(Vector2 touch, int pointer) {
+        starship.touchDragged(touch, pointer);
         return super.touchDragged(touch, pointer);
     }
 
     @Override
     public boolean keyDown(int keycode) {
+        starship.keyDown(keycode);
         return super.keyDown(keycode);
     }
 
