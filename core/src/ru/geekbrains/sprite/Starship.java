@@ -65,16 +65,16 @@ public class Starship extends Sprite {
     @Override
     public boolean keyDown(int keycode) {
         key = keycode;
-        if (key == Input.Keys.LEFT || keycode == Input.Keys.A) {
+        if (key == Input.Keys.LEFT || key == Input.Keys.A) {
             stopPos.set(worldBounds.getLeft(), pos.y);
         }
-        if (key == Input.Keys.RIGHT || keycode == Input.Keys.D) {
+        if (key == Input.Keys.RIGHT || key == Input.Keys.D) {
             stopPos.set(worldBounds.getRight(), pos.y);
         }
-        if (key == Input.Keys.DOWN || keycode == Input.Keys.S) {
+        if (key == Input.Keys.DOWN || key == Input.Keys.S) {
             stopPos.set(pos.x, worldBounds.getBottom());
         }
-        if (key == Input.Keys.UP || keycode == Input.Keys.W) {
+        if (key == Input.Keys.UP || key == Input.Keys.W) {
             stopPos.set(pos.x, worldBounds.getTop());
         }
         setStopPos(stopPos);
@@ -83,7 +83,9 @@ public class Starship extends Sprite {
 
     @Override
     public boolean keyUp(int keycode) {
-        setStopPos(pos);
+        if (key == keycode){
+            setStopPos(pos);
+        }
         return super.keyUp(keycode);
     }
 
