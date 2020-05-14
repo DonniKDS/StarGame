@@ -86,6 +86,7 @@ public class GameScreen extends BaseScreen {
 
     @Override
     public boolean keyUp(int keycode) {
+        starship.keyUp(keycode);
         return super.keyUp(keycode);
     }
 

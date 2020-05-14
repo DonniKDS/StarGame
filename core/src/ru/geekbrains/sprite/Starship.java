@@ -14,6 +14,8 @@ public class Starship extends Sprite {
     private Vector2 v;
     private Vector2 distance;
     private float speed;
+    private Rect worldBounds;
+    private float key;
 
     public Starship(TextureAtlas atlas) {
         super(atlas.findRegion("main_ship")
@@ -37,6 +39,7 @@ public class Starship extends Sprite {
 
     @Override
     public void resize(Rect worldBounds) {
+        this.worldBounds = worldBounds;
         setHeightProportion(0.2f);
         this.pos.set(worldBounds.pos);
     }
@@ -61,20 +64,27 @@ public class Starship extends Sprite {
 
     @Override
     public boolean keyDown(int keycode) {
-        if(keycode == Input.Keys.LEFT || keycode == Input.Keys.A) {
-            stopPos.set(pos.x - speed, pos.y);
+        key = keycode;
+        if (key == Input.Keys.LEFT || keycode == Input.Keys.A) {
+            stopPos.set(worldBounds.getLeft(), pos.y);
         }
-        if(keycode == Input.Keys.RIGHT || keycode == Input.Keys.D) {
-            stopPos.set(pos.x + speed, pos.y);
+        if (key == Input.Keys.RIGHT || keycode == Input.Keys.D) {
+            stopPos.set(worldBounds.getRight(), pos.y);
         }
-        if(keycode == Input.Keys.BACK || keycode == Input.Keys.S) {
-            stopPos.set(pos.x, pos.y - speed);
+        if (key == Input.Keys.BACK || keycode == Input.Keys.S) {
+            stopPos.set(pos.x, worldBounds.getBottom());
         }
-        if(keycode == Input.Keys.UP || keycode == Input.Keys.W) {
-            stopPos.set(pos.x, pos.y + speed);
+        if (key == Input.Keys.UP || keycode == Input.Keys.W) {
+            stopPos.set(pos.x, worldBounds.getTop());
         }
         setStopPos(stopPos);
         return super.keyDown(keycode);
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        setStopPos(pos);
+        return super.keyUp(keycode);
     }
 
     private void moveShipToStopPosition(){
