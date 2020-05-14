@@ -71,7 +71,7 @@ public class Starship extends Sprite {
         if (key == Input.Keys.RIGHT || keycode == Input.Keys.D) {
             stopPos.set(worldBounds.getRight(), pos.y);
         }
-        if (key == Input.Keys.BACK || keycode == Input.Keys.S) {
+        if (key == Input.Keys.DOWN || keycode == Input.Keys.S) {
             stopPos.set(pos.x, worldBounds.getBottom());
         }
         if (key == Input.Keys.UP || keycode == Input.Keys.W) {
