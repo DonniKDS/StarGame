@@ -29,7 +29,7 @@ public class GameScreen extends BaseScreen {
         mainAtlas = new TextureAtlas(Gdx.files.internal("textures/mainAtlas.tpack"));
         background = new Background(bg);
         starship = new Starship(mainAtlas);
-        stars = new Star[256];
+        stars = new Star[64];
         for (int i = 0; i < stars.length; i++) {
             stars[i] = new Star(menuAtlas);
         }
