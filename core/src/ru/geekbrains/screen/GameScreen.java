@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import ru.geekbrains.base.BaseScreen;
 import ru.geekbrains.math.Rect;
+import ru.geekbrains.pool.BulletPool;
 import ru.geekbrains.sprite.Background;
 import ru.geekbrains.sprite.Star;
 import ru.geekbrains.sprite.Starship;
@@ -14,25 +15,24 @@ import ru.geekbrains.sprite.Starship;
 public class GameScreen extends BaseScreen {
 
     private Texture bg;
-    private Texture ss;
     private Background background;
     private Starship starship;
-    private TextureAtlas menuAtlas;
     private TextureAtlas mainAtlas;
     private Star[] stars;
+    private BulletPool bulletPool;
 
     @Override
     public void show() {
         super.show();
         bg = new Texture("textures/bg.png");
-        menuAtlas = new TextureAtlas(Gdx.files.internal("textures/menuAtlas.pack"));
         mainAtlas = new TextureAtlas(Gdx.files.internal("textures/mainAtlas.tpack"));
         background = new Background(bg);
-        starship = new Starship(mainAtlas);
         stars = new Star[64];
         for (int i = 0; i < stars.length; i++) {
-            stars[i] = new Star(menuAtlas);
+            stars[i] = new Star(mainAtlas);
         }
+        bulletPool = new BulletPool();
+        starship = new Starship(mainAtlas, bulletPool);
     }
 
     @Override
@@ -48,15 +48,15 @@ public class GameScreen extends BaseScreen {
     public void render(float delta) {
         super.render(delta);
         update(delta);
+        free();
         draw();
     }
 
     @Override
     public void dispose() {
         bg.dispose();
-        ss.dispose();
-        menuAtlas.dispose();
         mainAtlas.dispose();
+        bulletPool.dispose();
         super.dispose();
     }
 
@@ -94,6 +94,12 @@ public class GameScreen extends BaseScreen {
         for (Star star : stars) {
             star.update(delta);
         }
+        bulletPool.updateActiveSprites(delta);
+        starship.update(delta);
+    }
+
+    private void free(){
+        bulletPool.freeAllDestroyed();
     }
 
     private void draw(){
@@ -102,6 +108,7 @@ public class GameScreen extends BaseScreen {
         for (Star star : stars) {
             star.draw(batch);
         }
+        bulletPool.drawActiveSprites(batch);
         starship.draw(batch);
         batch.end();
     }

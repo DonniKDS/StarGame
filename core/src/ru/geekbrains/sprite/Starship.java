@@ -3,23 +3,38 @@ package ru.geekbrains.sprite;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
 import ru.geekbrains.base.Sprite;
 import ru.geekbrains.math.Rect;
+import ru.geekbrains.pool.BulletPool;
 
 public class Starship extends Sprite {
 
     private Vector2 stopPos;
     private Vector2 v;
     private Vector2 distance;
+
     private float speed;
-    private Rect worldBounds;
     private float key;
 
-    public Starship(TextureAtlas atlas) {
+    private Rect worldBounds;
+
+    private BulletPool bulletPool;
+    private TextureRegion bulletRegion;
+    private Vector2 bulletV;
+    private Vector2 bulletPos;
+    private float bulletTimer;
+    private float bulletInterval;
+
+    public Starship(TextureAtlas atlas, BulletPool bulletPool) {
         super(atlas.findRegion("main_ship")
                 .split(atlas.findRegion("main_ship").originalWidth/2, atlas.findRegion("main_ship").originalHeight)[0]);
+        this.bulletPool = bulletPool;
+        bulletRegion = atlas.findRegion("bulletMainShip");
+        bulletV = new Vector2(0, 0.5f);
+        bulletPos = new Vector2();
         stopPos = new Vector2();
         v = new Vector2();
         distance = new Vector2();
@@ -28,7 +43,11 @@ public class Starship extends Sprite {
 
     @Override
     public void update(float delta) {
-
+        bulletTimer += 0.08f;
+        if (bulletTimer > bulletInterval) {
+            shoot();
+            bulletTimer = 0f;
+        }
     }
 
     @Override
@@ -42,6 +61,7 @@ public class Starship extends Sprite {
         this.worldBounds = worldBounds;
         setHeightProportion(0.2f);
         this.pos.set(worldBounds.pos);
+        bulletInterval = 1f;
     }
 
     @Override
@@ -114,5 +134,11 @@ public class Starship extends Sprite {
         distance.set(pos);
         v = pos.cpy().sub(stopPos);
         v.nor().scl(speed);
+    }
+
+    private void shoot() {
+        bulletPos.set(pos.x, getTop());
+        Bullet bullet = bulletPool.obtain();
+        bullet.set(this, bulletRegion, bulletPos, bulletV, 0.01f, worldBounds, 1);
     }
 }
