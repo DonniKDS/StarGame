@@ -32,6 +32,11 @@ public class Bullet extends Sprite {
         }
     }
 
+    @Override
+    public void dispose() {
+        bulletSound.dispose();
+    }
+
     public void set(
             Sprite owner,
             TextureRegion region,
