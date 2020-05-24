@@ -1,53 +1,45 @@
 package ru.geekbrains.sprite;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
-import ru.geekbrains.base.Sprite;
+import ru.geekbrains.base.Ship;
 import ru.geekbrains.math.Rect;
 import ru.geekbrains.pool.BulletPool;
+import ru.geekbrains.pool.ExplosionPool;
 
-public class Starship extends Sprite {
+public class Starship extends Ship {
+
+    private static final float SIZE = 0.2f;
+    private static final int HP = 100;
 
     private Vector2 stopPos;
-    private Vector2 v;
-    private Vector2 distance;
 
     private float speed;
     private float key;
 
-    private Rect worldBounds;
-
-    private BulletPool bulletPool;
-    private TextureRegion bulletRegion;
-    private Vector2 bulletV;
-    private Vector2 bulletPos;
-    private float bulletTimer;
-    private float bulletInterval;
-
-    public Starship(TextureAtlas atlas, BulletPool bulletPool) {
-        super(atlas.findRegion("main_ship")
-                .split(atlas.findRegion("main_ship").originalWidth/2, atlas.findRegion("main_ship").originalHeight)[0]);
+    public Starship(TextureAtlas atlas, BulletPool bulletPool, ExplosionPool explosionPool) {
+        super(atlas.findRegion("main_ship"), 1, 2, 2);
         this.bulletPool = bulletPool;
+        this.explosionPool = explosionPool;
         bulletRegion = atlas.findRegion("bulletMainShip");
         bulletV = new Vector2(0, 0.5f);
-        bulletPos = new Vector2();
+        bulletHeight = 0.01f;
+        damage = 1;
+        reloadInterval = 0.25f;
+        reloadTimer = reloadInterval;
         stopPos = new Vector2();
-        v = new Vector2();
-        distance = new Vector2();
         speed = 0.006f;
+        hp = HP;
+        sound = Gdx.audio.newSound(Gdx.files.internal("music/bulletSound.mp3"));
     }
 
     @Override
     public void update(float delta) {
-        bulletTimer += 0.08f;
-        if (bulletTimer > bulletInterval) {
-            shoot();
-            bulletTimer = 0f;
-        }
+        super.update(delta);
     }
 
     @Override
@@ -58,10 +50,9 @@ public class Starship extends Sprite {
 
     @Override
     public void resize(Rect worldBounds) {
-        this.worldBounds = worldBounds;
-        setHeightProportion(0.2f);
+        super.resize(worldBounds);
+        setHeightProportion(SIZE);
         this.pos.set(worldBounds.pos);
-        bulletInterval = 1f;
     }
 
     @Override
@@ -118,11 +109,21 @@ public class Starship extends Sprite {
         return super.keyUp(keycode);
     }
 
+    @Override
+    public void dispose() {
+        sound.dispose();
+    }
+
+    @Override
+    protected void shoot() {
+        super.shoot();
+    }
+
     private void moveShipToStopPosition(){
-        distance.sub(stopPos);
-        if (distance.len() >= v.len()){
+        v0.sub(stopPos);
+        if (v0.len() >= v.len()){
             pos.sub(v);
-            distance.set(pos);
+            v0.set(pos);
         } else {
             pos.set(stopPos);
             v.setZero();
@@ -131,14 +132,10 @@ public class Starship extends Sprite {
 
     private void setStopPos(Vector2 touch){
         stopPos.set(touch);
-        distance.set(pos);
-        v = pos.cpy().sub(stopPos);
+        v0.set(pos);
+        v.set(pos.cpy().sub(stopPos));
         v.nor().scl(speed);
     }
 
-    private void shoot() {
-        bulletPos.set(pos.x, getTop());
-        Bullet bullet = bulletPool.obtain();
-        bullet.set(this, bulletRegion, bulletPos, bulletV, 0.01f, worldBounds, 1);
-    }
+
 }

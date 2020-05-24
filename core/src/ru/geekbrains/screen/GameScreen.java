@@ -8,31 +8,40 @@ import com.badlogic.gdx.math.Vector2;
 import ru.geekbrains.base.BaseScreen;
 import ru.geekbrains.math.Rect;
 import ru.geekbrains.pool.BulletPool;
+import ru.geekbrains.pool.EnemyPool;
+import ru.geekbrains.pool.ExplosionPool;
 import ru.geekbrains.sprite.Background;
 import ru.geekbrains.sprite.Star;
 import ru.geekbrains.sprite.Starship;
+import ru.geekbrains.utils.EnemyEmitter;
 
 public class GameScreen extends BaseScreen {
 
     private Texture bg;
     private Background background;
     private Starship starship;
-    private TextureAtlas mainAtlas;
+    private TextureAtlas atlas;
     private Star[] stars;
     private BulletPool bulletPool;
+    private EnemyPool enemyPool;
+    private ExplosionPool explosionPool;
+    private EnemyEmitter enemyEmitter;
 
     @Override
     public void show() {
         super.show();
         bg = new Texture("textures/bg.png");
-        mainAtlas = new TextureAtlas(Gdx.files.internal("textures/mainAtlas.tpack"));
+        atlas = new TextureAtlas(Gdx.files.internal("textures/mainAtlas.tpack"));
         background = new Background(bg);
         stars = new Star[64];
         for (int i = 0; i < stars.length; i++) {
-            stars[i] = new Star(mainAtlas);
+            stars[i] = new Star(atlas);
         }
         bulletPool = new BulletPool();
-        starship = new Starship(mainAtlas, bulletPool);
+        explosionPool = new ExplosionPool(atlas);
+        enemyPool = new EnemyPool(bulletPool, explosionPool, worldBounds);
+        starship = new Starship(atlas, bulletPool, explosionPool);
+        enemyEmitter = new EnemyEmitter(atlas, enemyPool);
     }
 
     @Override
@@ -42,6 +51,7 @@ public class GameScreen extends BaseScreen {
         for (Star star : stars) {
             star.resize(worldBounds);
         }
+        enemyEmitter.resize(worldBounds);
     }
 
     @Override
@@ -55,8 +65,11 @@ public class GameScreen extends BaseScreen {
     @Override
     public void dispose() {
         bg.dispose();
-        mainAtlas.dispose();
+        atlas.dispose();
         bulletPool.dispose();
+        enemyPool.dispose();
+        explosionPool.dispose();
+        starship.dispose();
         super.dispose();
     }
 
@@ -95,11 +108,16 @@ public class GameScreen extends BaseScreen {
             star.update(delta);
         }
         bulletPool.updateActiveSprites(delta);
+        enemyPool.updateActiveSprites(delta);
+        explosionPool.updateActiveSprites(delta);
         starship.update(delta);
+        enemyEmitter.generate(delta);
     }
 
     private void free(){
         bulletPool.freeAllDestroyed();
+        enemyPool.freeAllDestroyed();
+        explosionPool.freeAllDestroyed();
     }
 
     private void draw(){
@@ -110,6 +128,8 @@ public class GameScreen extends BaseScreen {
         }
         bulletPool.drawActiveSprites(batch);
         starship.draw(batch);
+        enemyPool.drawActiveSprites(batch);
+        explosionPool.drawActiveSprites(batch);
         batch.end();
     }
 }
