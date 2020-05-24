@@ -18,10 +18,11 @@ public class Ship extends Sprite {
     protected Rect worldBounds;
 
     protected ExplosionPool explosionPool;
+
     protected BulletPool bulletPool;
     protected TextureRegion bulletRegion;
     protected Vector2 bulletV;
-
+    protected Vector2 bulletPos;
     protected float bulletHeight;
     protected int damage;
     protected float reloadTimer;
@@ -35,6 +36,7 @@ public class Ship extends Sprite {
         super(region, rows, cols, frames);
         v0 = new Vector2();
         v = new Vector2();
+        bulletPos = new Vector2();
     }
 
     public Ship(BulletPool bulletPool, ExplosionPool explosionPool, Rect worldBounds, Sound sound) {
@@ -45,6 +47,7 @@ public class Ship extends Sprite {
         v0 = new Vector2();
         v = new Vector2();
         bulletV = new Vector2();
+        bulletPos = new Vector2();
     }
 
     @Override
@@ -72,7 +75,7 @@ public class Ship extends Sprite {
 
     protected void shoot() {
         Bullet bullet = bulletPool.obtain();
-        bullet.set(this, bulletRegion, pos, bulletV, bulletHeight, worldBounds, damage);
+        bullet.set(this, bulletRegion, bulletPos, bulletV, bulletHeight, worldBounds, damage);
         sound.play();
     }
 

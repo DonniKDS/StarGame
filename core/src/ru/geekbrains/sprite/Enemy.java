@@ -11,15 +11,22 @@ import ru.geekbrains.pool.ExplosionPool;
 
 public class Enemy extends Ship {
 
+    private final Vector2 DEFAULT_V = new Vector2(0, -0.3f);;
+
     public Enemy(BulletPool bulletPool, ExplosionPool explosionPool, Rect worldBounds, Sound sound) {
         super(bulletPool, explosionPool, worldBounds, sound);
     }
 
     @Override
     public void update(float delta) {
-        super.update(delta);
-        if (getBottom() <= worldBounds.getBottom()) {
-            destroy();
+        if (getTop() > worldBounds.getTop()){
+            pos.mulAdd(DEFAULT_V, delta);
+        } else {
+            bulletPos.set(pos.x, pos.y - getHalfHeight());
+            super.update(delta);
+            if (getBottom() <= worldBounds.getBottom()) {
+                destroy();
+            }
         }
     }
 

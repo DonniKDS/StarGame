@@ -40,6 +40,7 @@ public class Starship extends Ship {
     @Override
     public void update(float delta) {
         super.update(delta);
+        bulletPos.set(pos.x, pos.y + getHalfHeight());
     }
 
     @Override
