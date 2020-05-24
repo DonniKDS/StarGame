@@ -7,6 +7,8 @@ import ru.geekbrains.math.Rect;
 
 public class GameOver extends Sprite {
 
+    private static final float MARGIN = 0.35f;
+
     public GameOver(TextureAtlas atlas) {
         super(atlas.findRegion("message_game_over"));
     }
@@ -14,5 +16,6 @@ public class GameOver extends Sprite {
     @Override
     public void resize(Rect worldBounds) {
         setHeightProportion(0.07f);
+        setBottom(worldBounds.getTop() - MARGIN);
     }
 }

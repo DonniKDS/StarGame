@@ -1,5 +1,6 @@
 package ru.geekbrains.screen;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -14,6 +15,7 @@ import ru.geekbrains.pool.EnemyPool;
 import ru.geekbrains.pool.ExplosionPool;
 import ru.geekbrains.sprite.Background;
 import ru.geekbrains.sprite.Bullet;
+import ru.geekbrains.sprite.ButtonNewGame;
 import ru.geekbrains.sprite.Enemy;
 import ru.geekbrains.sprite.GameOver;
 import ru.geekbrains.sprite.Star;
@@ -23,6 +25,8 @@ import ru.geekbrains.utils.EnemyEmitter;
 public class GameScreen extends BaseScreen {
 
     private enum State {PLAYING, GAME_OVER}
+
+    private final Game game;
 
     private Texture bg;
     private Background background;
@@ -35,6 +39,11 @@ public class GameScreen extends BaseScreen {
     private EnemyEmitter enemyEmitter;
     private State state;
     private GameOver gameOver;
+    private ButtonNewGame newGame;
+
+    public GameScreen(Game game) {
+        this.game = game;
+    }
 
     @Override
     public void show() {
@@ -52,6 +61,7 @@ public class GameScreen extends BaseScreen {
         starship = new Starship(atlas, bulletPool, explosionPool);
         enemyEmitter = new EnemyEmitter(atlas, enemyPool);
         gameOver = new GameOver(atlas);
+        newGame = new ButtonNewGame(atlas, game);
         state = State.PLAYING;
 
     }
@@ -65,6 +75,7 @@ public class GameScreen extends BaseScreen {
         }
         enemyEmitter.resize(worldBounds);
         gameOver.resize(worldBounds);
+        newGame.resize(worldBounds);
     }
 
     @Override
@@ -89,23 +100,29 @@ public class GameScreen extends BaseScreen {
 
     @Override
     public boolean touchDown(Vector2 touch, int pointer, int button) {
-        if (state == State.PLAYING){
+        if (state == State.PLAYING) {
             starship.touchDown(touch, pointer, button);
+        }
+        if (state == State.GAME_OVER) {
+            newGame.touchDown(touch, pointer, button);
         }
         return super.touchDown(touch, pointer, button);
     }
 
     @Override
     public boolean touchUp(Vector2 touch, int pointer, int button) {
-        if (state == State.PLAYING){
+        if (state == State.PLAYING) {
             starship.touchUp(touch, pointer, button);
+        }
+        if (state == State.GAME_OVER) {
+            newGame.touchUp(touch, pointer, button);
         }
         return super.touchUp(touch, pointer, button);
     }
 
     @Override
     public boolean touchDragged(Vector2 touch, int pointer) {
-        if (state == State.PLAYING){
+        if (state == State.PLAYING) {
             starship.touchDragged(touch, pointer);
         }
         return super.touchDragged(touch, pointer);
@@ -113,7 +130,7 @@ public class GameScreen extends BaseScreen {
 
     @Override
     public boolean keyDown(int keycode) {
-        if (state == State.PLAYING){
+        if (state == State.PLAYING) {
             starship.keyDown(keycode);
         }
         return super.keyDown(keycode);
@@ -121,7 +138,7 @@ public class GameScreen extends BaseScreen {
 
     @Override
     public boolean keyUp(int keycode) {
-        if (state == State.PLAYING){
+        if (state == State.PLAYING) {
             starship.keyUp(keycode);
         }
         return super.keyUp(keycode);
@@ -195,6 +212,7 @@ public class GameScreen extends BaseScreen {
             enemyPool.drawActiveSprites(batch);
         } else if (state == State.GAME_OVER) {
             gameOver.draw(batch);
+            newGame.draw(batch);
         }
         explosionPool.drawActiveSprites(batch);
         batch.end();

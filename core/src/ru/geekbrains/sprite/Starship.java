@@ -14,7 +14,7 @@ import ru.geekbrains.pool.ExplosionPool;
 public class Starship extends Ship {
 
     private static final float SIZE = 0.2f;
-    private static final int HP = 1;
+    private static final int HP = 100;
 
     private Vector2 stopPos;
 
