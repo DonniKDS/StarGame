@@ -14,7 +14,7 @@ import ru.geekbrains.pool.ExplosionPool;
 public class Starship extends Ship {
 
     private static final float SIZE = 0.2f;
-    private static final int HP = 100;
+    private static final int HP = 1;
 
     private Vector2 stopPos;
 
@@ -138,5 +138,11 @@ public class Starship extends Ship {
         v.nor().scl(speed);
     }
 
-
+    public boolean isBulletCollision(Bullet bullet) {
+        return !(bullet.getRight() < getLeft()
+                || bullet.getLeft() > getRight()
+                || bullet.getBottom() > pos.y
+                || bullet.getTop() < getBottom()
+        );
+    }
 }

@@ -5,17 +5,24 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.List;
+
 import ru.geekbrains.base.BaseScreen;
 import ru.geekbrains.math.Rect;
 import ru.geekbrains.pool.BulletPool;
 import ru.geekbrains.pool.EnemyPool;
 import ru.geekbrains.pool.ExplosionPool;
 import ru.geekbrains.sprite.Background;
+import ru.geekbrains.sprite.Bullet;
+import ru.geekbrains.sprite.Enemy;
+import ru.geekbrains.sprite.GameOver;
 import ru.geekbrains.sprite.Star;
 import ru.geekbrains.sprite.Starship;
 import ru.geekbrains.utils.EnemyEmitter;
 
 public class GameScreen extends BaseScreen {
+
+    private enum State {PLAYING, GAME_OVER}
 
     private Texture bg;
     private Background background;
@@ -26,6 +33,8 @@ public class GameScreen extends BaseScreen {
     private EnemyPool enemyPool;
     private ExplosionPool explosionPool;
     private EnemyEmitter enemyEmitter;
+    private State state;
+    private GameOver gameOver;
 
     @Override
     public void show() {
@@ -42,6 +51,9 @@ public class GameScreen extends BaseScreen {
         enemyPool = new EnemyPool(bulletPool, explosionPool, worldBounds);
         starship = new Starship(atlas, bulletPool, explosionPool);
         enemyEmitter = new EnemyEmitter(atlas, enemyPool);
+        gameOver = new GameOver(atlas);
+        state = State.PLAYING;
+
     }
 
     @Override
@@ -52,12 +64,14 @@ public class GameScreen extends BaseScreen {
             star.resize(worldBounds);
         }
         enemyEmitter.resize(worldBounds);
+        gameOver.resize(worldBounds);
     }
 
     @Override
     public void render(float delta) {
         super.render(delta);
         update(delta);
+        checkCollision();
         free();
         draw();
     }
@@ -75,31 +89,41 @@ public class GameScreen extends BaseScreen {
 
     @Override
     public boolean touchDown(Vector2 touch, int pointer, int button) {
-        starship.touchDown(touch, pointer, button);
+        if (state == State.PLAYING){
+            starship.touchDown(touch, pointer, button);
+        }
         return super.touchDown(touch, pointer, button);
     }
 
     @Override
     public boolean touchUp(Vector2 touch, int pointer, int button) {
-        starship.touchUp(touch, pointer, button);
+        if (state == State.PLAYING){
+            starship.touchUp(touch, pointer, button);
+        }
         return super.touchUp(touch, pointer, button);
     }
 
     @Override
     public boolean touchDragged(Vector2 touch, int pointer) {
-        starship.touchDragged(touch, pointer);
+        if (state == State.PLAYING){
+            starship.touchDragged(touch, pointer);
+        }
         return super.touchDragged(touch, pointer);
     }
 
     @Override
     public boolean keyDown(int keycode) {
-        starship.keyDown(keycode);
+        if (state == State.PLAYING){
+            starship.keyDown(keycode);
+        }
         return super.keyDown(keycode);
     }
 
     @Override
     public boolean keyUp(int keycode) {
-        starship.keyUp(keycode);
+        if (state == State.PLAYING){
+            starship.keyUp(keycode);
+        }
         return super.keyUp(keycode);
     }
 
@@ -107,11 +131,50 @@ public class GameScreen extends BaseScreen {
         for (Star star : stars) {
             star.update(delta);
         }
-        bulletPool.updateActiveSprites(delta);
-        enemyPool.updateActiveSprites(delta);
         explosionPool.updateActiveSprites(delta);
-        starship.update(delta);
-        enemyEmitter.generate(delta);
+        if (state == State.PLAYING) {
+            starship.update(delta);
+            bulletPool.updateActiveSprites(delta);
+            enemyPool.updateActiveSprites(delta);
+            enemyEmitter.generate(delta);
+        }
+    }
+
+    private void checkCollision() {
+        if (state != State.PLAYING){
+            return;
+        }
+        List<Enemy> enemyList = enemyPool.getActiveObjects();
+        List<Bullet> bulletList = bulletPool.getActiveObjects();
+        for (Enemy enemy : enemyList) {
+            float minDist = enemy.getHalfWidth() + starship.getHalfWidth();
+            if (starship.pos.dst(enemy.pos) < minDist) {
+                enemy.destroy();
+                starship.damage(enemy.getDamage());
+                continue;
+            }
+            for (Bullet bullet : bulletList) {
+                if (bullet.getOwner() != starship || bullet.isDestroyed()) {
+                    continue;
+                }
+                if (enemy.isBulletCollision(bullet)) {
+                    enemy.damage(bullet.getDamage());
+                    bullet.destroy();
+                }
+            }
+        }
+        for (Bullet bullet : bulletList) {
+            if (bullet.getOwner() == starship || bullet.isDestroyed()) {
+                continue;
+            }
+            if (starship.isBulletCollision(bullet)) {
+                starship.damage(bullet.getDamage());
+                bullet.destroy();
+            }
+        }
+        if (starship.isDestroyed()) {
+            state = State.GAME_OVER;
+        }
     }
 
     private void free(){
@@ -126,9 +189,13 @@ public class GameScreen extends BaseScreen {
         for (Star star : stars) {
             star.draw(batch);
         }
-        bulletPool.drawActiveSprites(batch);
-        starship.draw(batch);
-        enemyPool.drawActiveSprites(batch);
+        if (state == State.PLAYING){
+            starship.draw(batch);
+            bulletPool.drawActiveSprites(batch);
+            enemyPool.drawActiveSprites(batch);
+        } else if (state == State.GAME_OVER) {
+            gameOver.draw(batch);
+        }
         explosionPool.drawActiveSprites(batch);
         batch.end();
     }
