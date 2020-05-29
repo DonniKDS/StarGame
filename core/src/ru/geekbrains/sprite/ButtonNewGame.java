@@ -9,13 +9,13 @@ import ru.geekbrains.screen.GameScreen;
 
 public class ButtonNewGame extends BaseButton {
 
-    private final Game game;
-
     private static final float MARGIN = 0.35f;
 
-    public ButtonNewGame(TextureAtlas atlas, Game game) {
+    GameScreen gameScreen;
+
+    public ButtonNewGame(TextureAtlas atlas, GameScreen gameScreen) {
         super(atlas.findRegion("button_new_game"));
-        this.game = game;
+        this.gameScreen = gameScreen;
     }
 
     @Override
@@ -26,6 +26,6 @@ public class ButtonNewGame extends BaseButton {
 
     @Override
     public void action() {
-        game.setScreen(new GameScreen(game));
+        gameScreen.startNewGame();
     }
 }

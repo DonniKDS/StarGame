@@ -13,8 +13,8 @@ import ru.geekbrains.pool.ExplosionPool;
 
 public class Starship extends Ship {
 
-    private static final float SIZE = 0.2f;
-    private static final int HP = 100;
+    private static final float SIZE = 0.15f;
+    private static final int HP = 1;
 
     private Vector2 stopPos;
 
@@ -32,9 +32,16 @@ public class Starship extends Ship {
         reloadInterval = 0.25f;
         reloadTimer = reloadInterval;
         stopPos = new Vector2();
-        speed = 0.006f;
-        hp = HP;
         sound = Gdx.audio.newSound(Gdx.files.internal("music/bulletSound.mp3"));
+        startNewGame();
+    }
+
+    public void startNewGame() {
+        hp = HP;
+        speed = 0.006f;
+        this.pos.set(0, -0.3f);
+        stopPos.set(pos);
+        flushDestroy();
     }
 
     @Override
@@ -53,7 +60,7 @@ public class Starship extends Ship {
     public void resize(Rect worldBounds) {
         super.resize(worldBounds);
         setHeightProportion(SIZE);
-        this.pos.set(worldBounds.pos);
+        this.pos.set(0, -0.3f);
     }
 
     @Override

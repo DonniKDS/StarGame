@@ -61,7 +61,7 @@ public class GameScreen extends BaseScreen {
         starship = new Starship(atlas, bulletPool, explosionPool);
         enemyEmitter = new EnemyEmitter(atlas, enemyPool);
         gameOver = new GameOver(atlas);
-        newGame = new ButtonNewGame(atlas, game);
+        newGame = new ButtonNewGame(atlas, this);
         state = State.PLAYING;
 
     }
@@ -102,8 +102,7 @@ public class GameScreen extends BaseScreen {
     public boolean touchDown(Vector2 touch, int pointer, int button) {
         if (state == State.PLAYING) {
             starship.touchDown(touch, pointer, button);
-        }
-        if (state == State.GAME_OVER) {
+        } else if (state == State.GAME_OVER) {
             newGame.touchDown(touch, pointer, button);
         }
         return super.touchDown(touch, pointer, button);
@@ -113,8 +112,7 @@ public class GameScreen extends BaseScreen {
     public boolean touchUp(Vector2 touch, int pointer, int button) {
         if (state == State.PLAYING) {
             starship.touchUp(touch, pointer, button);
-        }
-        if (state == State.GAME_OVER) {
+        } else if (state == State.GAME_OVER) {
             newGame.touchUp(touch, pointer, button);
         }
         return super.touchUp(touch, pointer, button);
@@ -142,6 +140,14 @@ public class GameScreen extends BaseScreen {
             starship.keyUp(keycode);
         }
         return super.keyUp(keycode);
+    }
+
+    public void startNewGame() {
+        starship.startNewGame();
+        bulletPool.freeAllActiveObjects();
+        explosionPool.freeAllActiveObjects();
+        enemyPool.freeAllActiveObjects();
+        state = State.PLAYING;
     }
 
     private void update(float delta){
