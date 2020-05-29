@@ -15,13 +15,9 @@ public class Bullet extends Sprite {
     private int damage;
     private Sprite owner;
 
-    private Music bulletSound;
-
     public Bullet() {
         regions = new TextureRegion[1];
         v = new Vector2();
-        bulletSound = Gdx.audio.newMusic(Gdx.files.internal("music/bulletSound.mp3"));
-        bulletSound.setVolume(0.15f);
     }
 
     @Override
@@ -30,11 +26,6 @@ public class Bullet extends Sprite {
         if (isOutside(worldBounds)) {
             destroy();
         }
-    }
-
-    @Override
-    public void dispose() {
-        bulletSound.dispose();
     }
 
     public void set(
@@ -53,7 +44,6 @@ public class Bullet extends Sprite {
         setHeightProportion(height);
         this.worldBounds = worldBounds;
         this.damage = damage;
-        bulletSound.play();
     }
 
     public int getDamage() {
