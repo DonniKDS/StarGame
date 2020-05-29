@@ -97,6 +97,10 @@ public class Ship extends Sprite {
         return damage;
     }
 
+    public int getHp() {
+        return hp;
+    }
+
     protected void shoot() {
         Bullet bullet = bulletPool.obtain();
         bullet.set(this, bulletRegion, bulletPos, bulletV, bulletHeight, worldBounds, damage);
